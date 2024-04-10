@@ -1,9 +1,10 @@
 import os
 
-from sqlalchemy import Column, Integer, String, create_engine
+from sqlalchemy import Column, Integer, String, DateTime, create_engine
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.sql import func
 
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///app.db")
 engine = create_engine(DATABASE_URL)
@@ -27,3 +28,5 @@ class ShortenedUrl(Base):
     id = Column(Integer, primary_key=True)
     original_url = Column(String(255))
     short_link = Column(String(7), unique=True, index=True)
+    time_created = Column(DateTime(timezone=True), server_default=func.now())
+    valid_until = Column(DateTime(timezone=True), nullable=True)

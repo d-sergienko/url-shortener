@@ -1,6 +1,6 @@
 # URL Shortener with FastAPI
 
-[![CI](https://github.com/vancanhuit/url-shortener/actions/workflows/ci.yaml/badge.svg?branch=master)](https://github.com/vancanhuit/url-shortener/actions/workflows/ci.yaml)
+[![CI](https://github.com/d-sergienko/url-shortener/actions/workflows/ci.yaml/badge.svg?branch=master)](https://github.com/d-sergienko/url-shortener/actions/workflows/ci.yaml)
 
 [https://github.com/tiangolo/fastapi](https://github.com/tiangolo/fastapi)
 
@@ -40,7 +40,7 @@ Docker Compose version v2.12.2
 ```
 
 ```sh
-$ git clone https://github.com/vancanhuit/url-shortener.git
+$ git clone https://github.com/d-sergienko/url-shortener.git
 $ cd url-shortener
 $ docker compose up -d --build
 $ docker compose exec api alembic upgrade head # Run for the first time to initialize database schemas
