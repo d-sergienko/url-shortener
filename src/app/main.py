@@ -4,7 +4,7 @@ from fastapi import Body, Depends, FastAPI, HTTPException
 from fastapi.responses import RedirectResponse
 
 from pydantic import BaseModel, HttpUrl
-from typing import Annotated
+from typing import Annotated, Optional
 
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
@@ -16,20 +16,20 @@ app = FastAPI()
 
 class URL_To_Short(BaseModel):
     url: HttpUrl
-    valid_until: datetime | None
+    valid_until: Optional[datetime] = None
 
 class URL_To_Short_Change(BaseModel):
-    url: HttpUrl | None
-    valid_until: datetime | None
+    url: Optional[HttpUrl] = None
+    valid_until: Optional[datetime] = None
 
 @app.post("/api/shorten")
 def get_short_link(
-    url_to_short: Annotated[URL_To_Short, Body(embed=True)],
+    url_to_short: Annotated[URL_To_Short, Body(embed=False)],
     db: Session = Depends(get_db_session), 
 ):
 
     timestamp = datetime.now().replace(tzinfo=timezone.utc).timestamp()
-    url = url_to_short.url.strip()
+    url = url_to_short.url.unicode_string()
     short_link = create_short_link(url, timestamp)
     obj = ShortenedUrl(original_url=url, short_link=short_link, valid_until=url_to_short.valid_until)
     db.add(obj)
@@ -60,7 +60,7 @@ def delete_short_link(id: int, db: Session = Depends(get_db_session)):
 @app.put("/api/short_link/{id}")
 def update_short_link(
     id: int,
-    url_to_short: Annotated[URL_To_Short_Change, Body(embed=True)],
+    url_to_short: Annotated[URL_To_Short_Change, Body(embed=False)],
     db: Session = Depends(get_db_session)
 ):
     link: ShortenedUrl = db.get(ShortenedUrl, id)
@@ -71,7 +71,7 @@ def update_short_link(
         link.valid_until = url_to_short.valid_until
 
     if (url_to_short.url):
-        link.original_url = url_to_short.url.strip()
+        link.original_url = url_to_short.url.unicode_string()
 
     db.merge(link)
     db.commit()
