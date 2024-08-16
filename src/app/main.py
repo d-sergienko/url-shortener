@@ -29,8 +29,9 @@ def get_short_link(
 ):
 
     timestamp = datetime.now().replace(tzinfo=timezone.utc).timestamp()
-    short_link = create_short_link(url_to_short.url, timestamp)
-    obj = ShortenedUrl(original_url=url_to_short.url, short_link=short_link, valid_until=url_to_short.valid_until)
+    url = url_to_short.url.strip()
+    short_link = create_short_link(url, timestamp)
+    obj = ShortenedUrl(original_url=url, short_link=short_link, valid_until=url_to_short.valid_until)
     db.add(obj)
     db.commit()
 
@@ -70,7 +71,7 @@ def update_short_link(
         link.valid_until = url_to_short.valid_until
 
     if (url_to_short.url):
-        link.original_url = url_to_short.url
+        link.original_url = url_to_short.url.strip()
 
     db.merge(link)
     db.commit()
