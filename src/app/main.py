@@ -22,6 +22,8 @@ class URL_To_Short_Change(BaseModel):
     url: Optional[HttpUrl] = None
     valid_until: Optional[datetime] = None
 
+short_links_cache = dict()
+
 @app.post("/api/shorten")
 def get_short_link(
     url_to_short: Annotated[URL_To_Short, Body(embed=False)],
@@ -55,6 +57,7 @@ def delete_short_link(id: int, db: Session = Depends(get_db_session)):
         raise HTTPException(status_code=404, detail=f"Link id={id} not found")
     db.delete(link)
     db.commit()
+    short_links_cache.pop(link.short_link)
     return {"ok": True}
 
 @app.put("/api/short_link/{id}")
@@ -75,20 +78,26 @@ def update_short_link(
 
     db.merge(link)
     db.commit()
+    short_links_cache.pop(link.short_link)
     return db.get(ShortenedUrl, id)
 
 
 @app.get("/{short_link}")
 def redirect(short_link: str, db: Session = Depends(get_db_session)):
-    obj = (
-        db.query(ShortenedUrl)
-        .filter_by(short_link=short_link)
-        .filter(or_(ShortenedUrl.valid_until >= datetime.now(), ShortenedUrl.valid_until == None))
-        .order_by(ShortenedUrl.id.desc())
-        .first()
-    )
-    if obj is None:
-        raise HTTPException(
-            status_code=404, detail="The link does not exist, could not redirect."
+    if short_link in short_links_cache.keys():
+        obj = short_links_cache[short_link]
+    else:
+        obj = (
+            db.query(ShortenedUrl)
+            .filter_by(short_link=short_link)
+            .filter(or_(ShortenedUrl.valid_until >= datetime.now(), ShortenedUrl.valid_until == None))
+            .order_by(ShortenedUrl.id.desc())
+            .first()
         )
+        if obj is None:
+            raise HTTPException(
+                status_code=404, detail="The link does not exist, could not redirect."
+            )
+        else:
+            short_links_cache[short_link] = obj
     return RedirectResponse(url=obj.original_url)
