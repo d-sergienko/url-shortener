@@ -6,37 +6,36 @@
 
 ```sh
 $ docker version
-Client:
-Version:           20.10.12
-API version:       1.41
-Go version:        go1.17.3
-Git commit:        20.10.12-0ubuntu4
-Built:             Mon Mar  7 17:10:06 2022
-OS/Arch:           linux/amd64
-Context:           default
-Experimental:      true
+Client: Docker Engine - Community
+ Version:           27.5.1
+ API version:       1.47
+ Go version:        go1.22.11
+ Git commit:        9f9e405
+ Built:             Wed Jan 22 13:41:31 2025
+ OS/Arch:           linux/amd64
+ Context:           default
 
-Server:
-Engine:
-Version:          20.10.12
-API version:      1.41 (minimum version 1.12)
-Go version:       go1.17.3
-Git commit:       20.10.12-0ubuntu4
-Built:            Mon Mar  7 15:57:50 2022
-OS/Arch:          linux/amd64
-Experimental:     false
-containerd:
-Version:          1.5.9-0ubuntu3.1
-GitCommit:
-runc:
-Version:          1.1.0-0ubuntu1.1
-GitCommit:
-docker-init:
-Version:          0.19.0
-GitCommit:
+Server: Docker Engine - Community
+ Engine:
+  Version:          27.5.1
+  API version:      1.47 (minimum version 1.24)
+  Go version:       go1.22.11
+  Git commit:       4c9b3b0
+  Built:            Wed Jan 22 13:41:31 2025
+  OS/Arch:          linux/amd64
+  Experimental:     false
+ containerd:
+  Version:          1.7.25
+  GitCommit:        bcc810d6b9066471b0b6fa75f557a15a1cbf31bb
+ runc:
+  Version:          1.2.4
+  GitCommit:        v1.2.4-0-g6c52b3f
+ docker-init:
+  Version:          0.19.0
+  GitCommit:        de40ad0
 
 $ docker compose version
-Docker Compose version v2.12.2
+Docker Compose version v2.32.4
 ```
 
 ```sh
@@ -73,3 +72,5 @@ server: uvicorn
 ```
 
 Point your browser to http://localhost:8000/Nw4IY0Y or http://localhost:8000/pk9nq5_ (the links will be varied because they depend on timestamp).
+
+API docs available at http://localhost:8000/docs
