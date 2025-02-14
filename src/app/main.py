@@ -84,13 +84,14 @@ def update_short_link(
 
 @app.get("/{short_link}")
 def redirect(short_link: str, db: Session = Depends(get_db_session)):
-    if short_link in short_links_cache.keys():
+    _now = datetime.now()
+    if short_link in short_links_cache.keys() and short_links_cache[short_link].valid_until >= _now:
         obj = short_links_cache[short_link]
     else:
         obj = (
             db.query(ShortenedUrl)
             .filter_by(short_link=short_link)
-            .filter(or_(ShortenedUrl.valid_until >= datetime.now(), ShortenedUrl.valid_until == None))
+            .filter(or_(ShortenedUrl.valid_until >= _now, ShortenedUrl.valid_until == None))
             .order_by(ShortenedUrl.id.desc())
             .first()
         )
