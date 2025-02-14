@@ -57,7 +57,8 @@ def delete_short_link(id: int, db: Session = Depends(get_db_session)):
         raise HTTPException(status_code=404, detail=f"Link id={id} not found")
     db.delete(link)
     db.commit()
-    short_links_cache.pop(link.short_link)
+    if link.short_link in short_links_cache.keys():
+        short_links_cache.pop(link.short_link)
     return {"ok": True}
 
 @app.put("/api/short_link/{id}")
@@ -78,14 +79,15 @@ def update_short_link(
 
     db.merge(link)
     db.commit()
-    short_links_cache.pop(link.short_link)
+    if link.short_link in short_links_cache.keys():
+        short_links_cache.pop(link.short_link)
     return db.get(ShortenedUrl, id)
 
 
 @app.get("/{short_link}")
 def redirect(short_link: str, db: Session = Depends(get_db_session)):
     _now = datetime.now()
-    if short_link in short_links_cache.keys() and short_links_cache[short_link].valid_until >= _now:
+    if short_link in short_links_cache.keys() and short_links_cache[short_link].valid_until and short_links_cache[short_link].valid_until >= _now.astimezone():
         obj = short_links_cache[short_link]
     else:
         obj = (
