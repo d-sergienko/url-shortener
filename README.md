@@ -1,9 +1,16 @@
 # URL Shortener with FastAPI
 
-[![CI](https://github.com/d-sergienko/url-shortener/actions/workflows/ci.yaml/badge.svg?branch=master)](https://github.com/d-sergienko/url-shortener/actions/workflows/ci.yaml)
+This microservice is intended for fast URL redirection using short urls.
+It is using FastAPI with Uvicorn as HTTP backend, and PostgreSQL database for data storage.
 
-[https://github.com/tiangolo/fastapi](https://github.com/tiangolo/fastapi)
+Key differences from the [original repo](https://github.com/vancanhuit/url-shortener):
+* 3x speedup (implemented in-memory cache)
+* added `valid_until` parameter to stop redirecting after the time specified
+* added methods to get/update/delete objects in the database
 
+API docs are available at http://localhost:8000/docs
+
+# Environment
 ```sh
 $ docker version
 Client: Docker Engine - Community
@@ -38,6 +45,7 @@ $ docker compose version
 Docker Compose version v2.32.4
 ```
 
+# Setup
 ```sh
 $ git clone https://github.com/d-sergienko/url-shortener.git
 $ cd url-shortener
@@ -48,6 +56,7 @@ $ docker compose exec db psql --username=dev --dbname=dev # Check database schem
 $ docker compose exec api pytest # Run test
 ```
 
+# Usage
 Using [curl](https://curl.haxx.se) and [jq](https://stedolan.github.io/jq/):
 ```sh
 $ curl -X POST -d '{"url": "https://google.com"}' -H "Content-Type: application/json" http://localhost:8000/api/shorten | jq .
@@ -72,5 +81,3 @@ server: uvicorn
 ```
 
 Point your browser to http://localhost:8000/Nw4IY0Y or http://localhost:8000/pk9nq5_ (the links will be varied because they depend on timestamp).
-
-API docs available at http://localhost:8000/docs
