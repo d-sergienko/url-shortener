@@ -8,4 +8,4 @@ def create_short_link(original_url: str, timestamp: float):
     b64_encoded_str = base64.urlsafe_b64encode(
         hashlib.sha256(to_encode.encode()).digest()
     ).decode()
-    return b64_encoded_str[:7]
+    return b64_encoded_str[:2]  # changed 7-> 2
