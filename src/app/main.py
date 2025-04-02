@@ -10,29 +10,36 @@ from sqlalchemy.orm import Session
 from sqlalchemy import or_
 
 from .db import ShortenedUrl, get_db_session
-from .service import create_short_link
+from .service import create_short_link,check_short_link
 
 app = FastAPI()
 
 class URL_To_Short(BaseModel):
     url: HttpUrl
     valid_until: Optional[datetime] = None
+    short_len: Optional[int] = None
 
 class URL_To_Short_Change(BaseModel):
     url: Optional[HttpUrl] = None
     valid_until: Optional[datetime] = None
+    short_len: Optional[int] = None
 
 short_links_cache = dict()
 
 @app.post("/api/shorten")
 def get_short_link(
     url_to_short: Annotated[URL_To_Short, Body(embed=False)],
-    db: Session = Depends(get_db_session), 
+    db: Session = Depends(get_db_session)
 ):
 
     timestamp = datetime.now().replace(tzinfo=timezone.utc).timestamp()
     url = url_to_short.url.unicode_string()
-    short_link = create_short_link(url, timestamp)
+    short_len = url_to_short.short_len
+    if short_len > 64 or short_len < 3 or short_len is None:
+        short_len = 3
+    short_link = create_short_link(url, timestamp, short_len)
+    while check_short_link(short_link):
+        short_link = create_short_link(url, timestamp)
     obj = ShortenedUrl(original_url=url, short_link=short_link, valid_until=url_to_short.valid_until)
     db.add(obj)
     db.commit()

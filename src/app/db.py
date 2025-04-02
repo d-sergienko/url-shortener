@@ -27,6 +27,6 @@ class ShortenedUrl(Base):
 
     id = Column(Integer, primary_key=True)
     original_url = Column(String(255))
-    short_link = Column(String(7), unique=True, index=True)
+    short_link = Column(String(3), unique=True, index=True)
     time_created = Column(DateTime(timezone=True), server_default=func.now())
     valid_until = Column(DateTime(timezone=True), nullable=True)
