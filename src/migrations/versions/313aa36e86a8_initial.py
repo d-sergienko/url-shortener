@@ -21,7 +21,7 @@ def upgrade():
     op.create_table('shortened_urls',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('original_url', sa.String(length=255), nullable=True),
-    sa.Column('short_link', sa.String(length=64), nullable=True),
+    sa.Column('short_link', sa.String(length=7), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_shortened_urls_short_link'), 'shortened_urls', ['short_link'], unique=True)
