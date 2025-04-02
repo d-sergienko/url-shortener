@@ -26,6 +26,7 @@ class URL_To_Short_Change(BaseModel):
 
 short_links_cache = dict()
 
+
 @app.post("/api/shorten")
 def get_short_link(
     url_to_short: Annotated[URL_To_Short, Body(embed=False)],
@@ -38,7 +39,7 @@ def get_short_link(
     if short_len > 64 or short_len < 3 or short_len is None:
         short_len = 3
     short_link = create_short_link(url, timestamp, short_len)
-    while check_short_link(short_link):
+    while ( db.query(ShortenedUrl).filter_by(short_link=short_link).order_by(ShortenedUrl.id.desc()).first() ) is not None:
         short_link = create_short_link(url, timestamp)
     obj = ShortenedUrl(original_url=url, short_link=short_link, valid_until=url_to_short.valid_until)
     db.add(obj)
