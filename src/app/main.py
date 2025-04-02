@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import or_
 
 from .db import ShortenedUrl, get_db_session
-from .service import create_short_link,check_short_link
+from .service import create_short_link
 
 app = FastAPI()
 
