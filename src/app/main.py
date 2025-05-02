@@ -35,7 +35,9 @@ def get_short_link(
 
     timestamp = datetime.now().replace(tzinfo=timezone.utc).timestamp()
     url = url_to_short.url.unicode_string()
-    short_len = url_to_short.short_len
+    short_len = 3
+    if url_to_short.short_len:
+        short_len = url_to_short.short_len
     if short_len > 64 or short_len < 3 or short_len is None:
         short_len = 3
     short_link = create_short_link(url, timestamp, short_len)
