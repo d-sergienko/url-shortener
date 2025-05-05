@@ -59,7 +59,7 @@ $ docker compose exec api pytest # Run test
 # Usage
 Using [curl](https://curl.haxx.se) and [jq](https://stedolan.github.io/jq/):
 ```sh
-$ curl -X POST -d '{"url": "https://google.com", "short_len": 5 }' -H "Content-Type: application/json" http://localhost:8000/api/shorten | jq .
+$ curl -X POST -d '{"url": "https://google.com", "short_len": 7 }' -H "Content-Type: application/json" http://localhost:8000/api/shorten | jq .
 {
   "short_link": "Nw4IY0Y"
 }
