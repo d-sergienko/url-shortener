@@ -35,6 +35,14 @@ def get_short_link(
 
     timestamp = datetime.now().replace(tzinfo=timezone.utc).timestamp()
     url = url_to_short.url.unicode_string()
+
+    short_link = None
+    pre_line = None    
+    pre_line = db.query(ShortenedUrl).filter_by(original_url=url).order_by(ShortenedUrl.id.desc()).first()
+    if pre_line is not None:
+        short_link = pre_line.short_link
+        return {"short_link": short_link}
+
     short_len = 3
     if url_to_short.short_len:
         short_len = url_to_short.short_len
