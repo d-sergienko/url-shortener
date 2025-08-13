@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 
 import logging
 import time
+import uuid
 
 from fastapi import Body, Depends, FastAPI, HTTPException, Request
 from fastapi.responses import RedirectResponse, JSONResponse
@@ -35,27 +36,39 @@ app = FastAPI()
 async def log_requests(request: Request, call_next):
     start_time = time.time()
 
+    # Generate a unique request ID
+    request_id = str(uuid.uuid4())
+
+    # Determine real client IP (handle proxy case)
+    client_ip = request.headers.get("x-forwarded-for", request.client.host)
+    # If multiple IPs in X-Forwarded-For, take the first one (real client)
+    if "," in client_ip:
+        client_ip = client_ip.split(",")[0].strip()
+
     # Log request details
-    logger.debug(f"Request start: {request.method} {request.url}")
-    logger.debug(f"Headers: {dict(request.headers)}")
+    logger.debug(f"[{request_id}] Request start: {request.method} {request.url} from {client_ip}")
+    logger.debug(f"[{request_id}] Headers: {dict(request.headers)}")
     body = await request.body()
     if body:
-        logger.debug(f"Body: {body.decode('utf-8', errors='ignore')}")
+        logger.debug(f"[{request_id}] Body: {body.decode('utf-8', errors='ignore')}")
 
     # Process request
     try:
         response = await call_next(request)
     except Exception as e:
-        logger.exception("Unhandled error during request processing")
+        logger.exception(f"[{request_id}] Unhandled error during request processing")
         return JSONResponse(
             status_code=500,
-            content={"error": "Internal Server Error", "detail": str(e)}
+            content={"error": "Internal Server Error", "request_id": request_id, "detail": str(e)}
         )
 
     # Calculate processing time
     process_time = (time.time() - start_time) * 1000
-    logger.debug(f"Request completed in {process_time:.2f}ms")
-    logger.debug(f"Response status: {response.status_code}")
+    logger.debug(f"[{request_id}] Request completed in {process_time:.2f}ms")
+    logger.debug(f"[{request_id}] Response status: {response.status_code}")
+
+    # Add request_id to response headers for tracing
+    response.headers["X-Request-ID"] = request_id
 
     return response
 
