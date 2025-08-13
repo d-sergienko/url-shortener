@@ -64,8 +64,7 @@ async def log_requests(request: Request, call_next):
 
     # Calculate processing time
     process_time = (time.time() - start_time) * 1000
-    logger.debug(f"[{request_id}] Request completed in {process_time:.2f}ms")
-    logger.debug(f"[{request_id}] Response status: {response.status_code}")
+    logger.debug(f"[{request_id}] Request completed in {process_time:.2f}ms with status: {response.status_code}")
 
     # Add request_id to response headers for tracing
     response.headers["X-Request-ID"] = request_id
