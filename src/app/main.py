@@ -21,7 +21,7 @@ from .service import create_short_link
 # --------------------
 logging.basicConfig(
     level=logging.DEBUG,  # Use DEBUG for very detailed logs
-    format="%(asctime)s | %(levelname)-8s | %(name)s | %(funcName)s | %(message)s",
+    format="%(asctime)s | %(levelname)-8s | %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S"
 )
 
