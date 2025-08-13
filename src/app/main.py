@@ -1,7 +1,10 @@
 from datetime import datetime, timezone
 
-from fastapi import Body, Depends, FastAPI, HTTPException
-from fastapi.responses import RedirectResponse
+import logging
+import time
+
+from fastapi import Body, Depends, FastAPI, HTTPException, Request
+from fastapi.responses import RedirectResponse, JSONResponse
 
 from pydantic import BaseModel, HttpUrl
 from typing import Annotated, Optional
@@ -12,7 +15,50 @@ from sqlalchemy import or_
 from .db import ShortenedUrl, get_db_session
 from .service import create_short_link
 
+# --------------------
+# Logging Configuration
+# --------------------
+logging.basicConfig(
+    level=logging.DEBUG,  # Use DEBUG for very detailed logs
+    format="%(asctime)s | %(levelname)-8s | %(name)s | %(funcName)s | %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S"
+)
+
+logger = logging.getLogger("url-shortener")
+
 app = FastAPI()
+
+# --------------------
+# Middleware for logging requests & responses
+# --------------------
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start_time = time.time()
+
+    # Log request details
+    logger.debug(f"Request start: {request.method} {request.url}")
+    logger.debug(f"Headers: {dict(request.headers)}")
+    body = await request.body()
+    if body:
+        logger.debug(f"Body: {body.decode('utf-8', errors='ignore')}")
+
+    # Process request
+    try:
+        response = await call_next(request)
+    except Exception as e:
+        logger.exception("Unhandled error during request processing")
+        return JSONResponse(
+            status_code=500,
+            content={"error": "Internal Server Error", "detail": str(e)}
+        )
+
+    # Calculate processing time
+    process_time = (time.time() - start_time) * 1000
+    logger.debug(f"Request completed in {process_time:.2f}ms")
+    logger.debug(f"Response status: {response.status_code}")
+
+    return response
+
 
 class URL_To_Short(BaseModel):
     url: HttpUrl
