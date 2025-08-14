@@ -108,7 +108,7 @@ def get_short_link(
         short_len = 3
     short_link = create_short_link(url, timestamp, short_len)
     while ( db.query(ShortenedUrl).filter_by(short_link=short_link).order_by(ShortenedUrl.id.desc()).first() ) is not None:
-        short_link = create_short_link(url, timestamp)
+        short_link = create_short_link(url, timestamp, short_len)
     obj = ShortenedUrl(original_url=url, short_link=short_link, valid_until=url_to_short.valid_until)
     db.add(obj)
     db.commit()
